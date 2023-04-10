@@ -1,180 +1,114 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>To-Do List App</title>
-    <!-- Meta Tags -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Links -->
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
-      integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ=="
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css"
-      integrity="sha512-NXUhxhkDgZYOMjaIgd89zF2w51Mub53Ru3zCNp5LTlEzMbNNAjTjDbpURYGS5Mop2cU4b7re1nOIucsVlrx9fA=="
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="css/main.css" />
-  </head>
-  <body>
-    <!-- Main Header -->
-    <header class="main-header">
-      <div class="ui container">
-        <h1>To-Do List App</h1>
-      </div>
-    </header>
-    <!-- End Main Header -->
+<html>
+<head>
+	<title>To-Do List</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+		}
+		h1 {
+			text-align: center;
+			color: #333;
+			margin-top: 20px;
+			margin-bottom: 30px;
+		}
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
+		li {
+			padding: 10px;
+			border: 1px solid #ccc;
+			margin-bottom: 10px;
+			background-color: #f9f9f9;
+			border-radius: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		li span {
+			flex-grow: 1;
+			margin-right: 10px;
+		}
+		li button {
+			background-color: #e74c3c;
+			color: #fff;
+			border: none;
+			padding: 5px 10px;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+		li button:hover {
+			background-color: #c0392b;
+		}
+		input[type="text"] {
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			width: 60%;
+			margin-right: 10px;
+		}
+		input[type="submit"] {
+			background-color: #3498db;
+			color: #fff;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		input[type="submit"]:hover {
+			background-color: #2980b9;
+		}
+	</style>
+</head>
+<body>
+	<h1>To-Do List</h1>
+	<form id="addForm">
+		<label for="task">New task:</label>
+		<input type="text" id="task" name="task" placeholder="Enter a new task...">
+		<input type="submit" value="Add">
+	</form>
+	<ul id="taskList">
+		<li>
+			<span>Task 1</span>
+			<button class="deleteBtn">Delete</button>
+		</li>
+		<li>
+			<span>Task 2</span>
+			<button class="deleteBtn">Delete</button>
+		</li>
+		<li>
+			<span>Task 3</span>
+			<button class="deleteBtn">Delete</button>
+		</li>
+	</ul>
 
-    <div class="ui container">
-      <!-- Add Task -->
-      <form id="add-task" class="ui left icon input fluid">
-        <input
-          id="add-task-input"
-          class="large"
-          type="text"
-          placeholder="Write your task here..."
-        />
-        <i class="tasks icon"></i>
-      </form>
-      <!-- End Add Task -->
+	<script>
+		const addForm = document.getElementById("addForm");
+		const taskList = document.getElementById("taskList");
 
-      <!-- Buttons -->
-      <div id="buttons" class="ui stackable grid equal width">
-        <button
-          id="clear-all-tasks"
-          class="ui button column"
-          onclick="showClearAllTasksModal()"
-        >
-          Clear all tasks
-        </button>
-        <button
-          disabled
-          class="ui button column"
-          onclick="showClearCompletedTasksModal()"
-        >
-          Clear completed tasks
-        </button>
-      </div>
-      <!-- End Buttons -->
+		// Add task
+		addForm.addEventListener("submit", function(event) {
+			event.preventDefault();
+			const newTask = document.getElementById("task").value;
+			if (newTask === "") return;
+			const taskItem = document.createElement("li");
+			taskItem.innerHTML = `
+				<span>${newTask}</span>
+				<button class="deleteBtn">Delete</button>
+			`;
+			taskList.appendChild(taskItem);
+			document.getElementById("task").value = "";
+		});
 
-      <!-- Tasks List -->
-      <ul id="tasks-list" class="ui segments"></ul>
-      <!-- End Tasks List -->
-
-      <!-- Edit Modal -->
-      <div id="edit-modal" class="ui tiny modal">
-        <div class="header">Update Your Task</div>
-        <div class="content">
-          <div class="ui fluid input">
-            <input id="task-id" type="hidden" />
-            <input id="task-text" type="text" />
-          </div>
-        </div>
-        <div class="actions">
-          <div class="ui cancel button">Cancel</div>
-          <div id="update-button" class="ui positive right labeled icon button">
-            Update
-            <i class="checkmark icon"></i>
-          </div>
-        </div>
-      </div>
-      <!-- End Edit Modal -->
-
-      <!-- Delete Modal -->
-      <div id="remove-modal" class="ui tiny modal">
-        <div class="header">Delete Your Task</div>
-        <div class="content">
-          <div class="ui fluid input">
-            <input id="task-id" type="hidden" />
-            <p>Are you sure you want to delete your task?</p>
-          </div>
-        </div>
-        <div class="actions">
-          <div class="ui cancel red button">No</div>
-          <div id="remove-button" class="ui positive right labeled icon button">
-            Yes
-            <i class="checkmark icon"></i>
-          </div>
-        </div>
-      </div>
-      <!-- End Delete Modal -->
-
-      <!-- Clear All Tasks Modal -->
-      <div id="clear-all-tasks-modal" class="ui tiny modal">
-        <div class="header">Clear All Tasks</div>
-        <div class="content">
-          <div class="ui fluid input">
-            <input id="task-id" type="hidden" />
-            <p>Are you sure you want to clear all tasks?</p>
-          </div>
-        </div>
-        <div class="actions">
-          <div class="ui cancel red button">No</div>
-          <div
-            id="remove-button"
-            onclick="clearAllTasks()"
-            class="ui positive right labeled icon button"
-          >
-            Yes
-            <i class="checkmark icon"></i>
-          </div>
-        </div>
-      </div>
-      <!-- End Clear All Tasks Modal -->
-
-      <!-- Clear Completed Tasks Modal -->
-      <div id="clear-completed-tasks-modal" class="ui tiny modal">
-        <div class="header">Clear Completed Tasks</div>
-        <div class="content">
-          <div class="ui fluid input">
-            <input id="task-id" type="hidden" />
-            <p>Are you sure you want to clear completed tasks?</p>
-          </div>
-        </div>
-        <div class="actions">
-          <div class="ui cancel red button">No</div>
-          <div
-            id="remove-button"
-            onclick="clearAllTasks()"
-            class="ui positive right labeled icon button"
-          >
-            Yes
-            <i class="checkmark icon"></i>
-          </div>
-        </div>
-      </div>
-      <!-- End Clear Completed Tasks Modal -->
-    </div>
-
-    <!-- Scripts -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"
-      integrity="sha512-lOrm9FgT1LKOJRUXF3tp6QaMorJftUjowOWiDcG5GFZ/q7ukof19V0HKx/GWzXCdt9zYju3/KhBNdCLzK8b90Q=="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
-      integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
-      integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw=="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/toastify-js"
-    ></script>
-    <script type="text/javascript" src="js/main.js"></script>
-  </body>
-</html>
+		// Delete task
+		taskList.addEventListener("click", function(event) {
+			if (event.target.classList.contains("deleteBtn")) {
+				event.target.parentElement.remove();
+			}
+		});
+	</script>
+</body>
+</html
